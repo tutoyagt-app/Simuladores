@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TUTOYA — Simulador de Cálculo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --primary:#090f39; --primary-mid:#111d6a;
+  --gold:#F5C518; --cyan:#00D4FF;
+  --success:#10B981; --error:#EF4444;
+  --ts:rgba(255,255,255,0.6);
+  --cb:rgba(255,255,255,0.05);
+  --cbr:rgba(255,255,255,0.1);
+  --r:14px; --rs:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Exo 2',sans-serif;background:var(--primary);color:#fff;min-height:100vh}
+
+/* HEADER */
+.header{background:linear-gradient(180deg,#111d6a 0%,var(--primary) 100%);padding:20px;text-align:center;border-bottom:1px solid var(--cbr)}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:6px}
+.logo-pi{width:44px;height:44px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:var(--primary);box-shadow:0 0 20px rgba(245,197,24,0.4)}
+.logo-text{font-size:24px;font-weight:900;letter-spacing:2px}
+.logo-text span{color:var(--gold)}
+.header-sub{font-size:11px;color:var(--ts);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px}
+.header-autor{font-size:11px;color:rgba(255,255,255,0.4);letter-spacing:0.5px}
+
+/* TABS */
+.tabs-bar{background:var(--primary);border-bottom:1px solid var(--cbr);padding:10px 0;position:sticky;top:0;z-index:100}
+.tabs-inner{max-width:780px;margin:0 auto;padding:0 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs-inner::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1.5px solid var(--cbr);background:var(--cb);color:var(--ts);font-size:12px;font-weight:700;font-family:'Exo 2',sans-serif;cursor:pointer;transition:all 0.2s;white-space:nowrap;letter-spacing:0.3px}
+.tab.active{background:var(--gold);color:var(--primary);border-color:var(--gold);box-shadow:0 0 14px rgba(245,197,24,0.35)}
+.tab:hover:not(.active){border-color:var(--cyan);color:var(--cyan)}
+
+/* MAIN LAYOUT */
+.page{max-width:780px;margin:0 auto;padding:16px}
+.panel{display:none;animation:fi 0.25s ease}
+.panel.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--cb);border:1px solid var(--cbr);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
+.card-title::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px;flex-shrink:0}
+
+/* STEP BADGE */
+.step-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,197,24,0.12);border:1px solid rgba(245,197,24,0.3);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--gold);margin-bottom:12px;letter-spacing:0.5px}
+.step-num{width:20px;height:20px;background:var(--gold);color:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+
+/* INPUTS */
+.input-row{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.lbl{font-size:12px;color:var(--ts);font-weight:600;white-space:nowrap;min-width:50px;font-family:'JetBrains Mono',monospace}
+.mi{flex:1;min-width:110px;background:rgba(255,255,255,0.07);border:1.5px solid var(--cbr);border-radius:var(--rs);padding:9px 12px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color 0.2s}
+.mi:focus{border-color:var(--cyan)}
+.mi::placeholder{color:rgba(255,255,255,0.25)}
+.ni{width:68px;background:rgba(255,255,255,0.07);border:1.5px solid var(--cbr);border-radius:var(--rs);padding:9px 10px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;text-align:center;transition:border-color 0.2s}
+.ni:focus{border-color:var(--cyan)}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 4px}
+.chip{padding:4px 11px;border-radius:20px;background:rgba(245,197,24,0.08);border:1px solid rgba(245,197,24,0.25);color:var(--gold);font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;transition:all 0.15s}
+.chip:hover{background:rgba(245,197,24,0.18);border-color:var(--gold)}
+
+/* BUTTONS */
+.btn{padding:11px 20px;border-radius:var(--rs);border:none;font-family:'Exo 2',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px}
+.btn-gold{background:var(--gold);color:var(--primary);width:100%;margin-top:6px;box-shadow:0 4px 14px rgba(245,197,24,0.28)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,197,24,0.4)}
+.btn-outline{background:transparent;color:var(--cyan);border:1.5px solid var(--cyan);font-size:12px;padding:7px 14px}
+.btn-outline:hover{background:rgba(0,212,255,0.1)}
+
+/* CANVAS */
+.canvas-wrap{background:rgba(0,0,0,0.5);border-radius:var(--rs);overflow:hidden;border:1px solid var(--cbr)}
+canvas{display:block;width:100%;height:auto}
+
+/* LEGEND */
+.legend{display:flex;gap:14px;justify-content:center;padding:8px 0;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ts)}
+.ld{width:18px;height:3px;border-radius:2px}
+
+/* RESULTS GRID */
+.rg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.rb{background:rgba(0,0,0,0.25);border-radius:var(--rs);padding:10px 12px;border-left:3px solid var(--gold)}
+.rb.c{border-left-color:var(--cyan)}.rb.g{border-left-color:var(--success)}.rb.e{border-left-color:var(--error)}
+.rl{font-size:10px;color:var(--ts);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;font-weight:600}
+.rv{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700}
+
+/* SLIDER */
+.sw{margin:10px 0}
+.sl-lbl{font-size:12px;color:var(--ts);margin-bottom:6px;display:flex;gap:6px;align-items:center}
+.sl-lbl .v{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-weight:700}
+input[type=range]{width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,0.15);outline:none;-webkit-appearance:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 0 10px rgba(245,197,24,0.5)}
+
+/* INFO BOXES */
+.ibox{background:rgba(0,212,255,0.07);border:1px solid rgba(0,212,255,0.18);border-radius:var(--rs);padding:12px;margin-top:10px}
+.ibox p{font-size:12px;color:rgba(255,255,255,0.85);line-height:1.7;margin-bottom:4px}
+.ibox p:last-child{margin-bottom:0}
+.ibox strong{color:var(--gold)}
+.formula{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(0,0,0,0.35);padding:7px 10px;border-radius:8px;margin:6px 0;color:var(--cyan);display:block;line-height:1.6}
+
+.sbox{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.22);border-radius:var(--rs);padding:14px;margin-top:10px}
+.sbox-title{font-size:12px;font-weight:700;color:var(--success);margin-bottom:8px}
+.steps-list{list-style:none;counter-reset:s}
+.steps-list li{counter-increment:s;font-size:12px;color:rgba(255,255,255,0.8);padding:4px 0 4px 24px;position:relative;line-height:1.5}
+.steps-list li::before{content:counter(s);position:absolute;left:0;width:16px;height:16px;background:var(--success);color:var(--primary);border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;top:5px}
+
+.wbox{background:rgba(245,197,24,0.07);border:1px solid rgba(245,197,24,0.22);border-radius:var(--rs);padding:12px;margin-top:10px}
+.wbox-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px}
+
+.tuto{display:flex;align-items:flex-start;gap:10px;background:rgba(245,197,24,0.06);border:1px solid rgba(245,197,24,0.16);border-radius:var(--rs);padding:12px;margin-top:10px}
+.tuto-av{width:36px;height:36px;background:#111d6a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:2px solid var(--gold)}
+.tuto-txt{font-size:12px;color:rgba(255,255,255,0.85);line-height:1.6}
+.tuto-txt strong{color:var(--gold)}
+
+/* CP items */
+.cp-item{background:rgba(0,0,0,0.2);border-radius:var(--rs);padding:12px;margin-bottom:8px;border:1px solid var(--cbr)}
+.cp-badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.cp-badge.max{background:rgba(239,68,68,0.15);color:var(--error);border:1px solid var(--error)}
+.cp-badge.min{background:rgba(16,185,129,0.15);color:var(--success);border:1px solid var(--success)}
+.cp-badge.inf{background:rgba(245,197,24,0.15);color:var(--gold);border:1px solid var(--gold)}
+
+/* INTERSECTIONS TABLE */
+.its-table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.its-table th{background:rgba(245,197,24,0.12);color:var(--gold);padding:7px 10px;text-align:left;font-size:11px;letter-spacing:0.5px}
+.its-table td{padding:7px 10px;border-bottom:1px solid var(--cbr);font-family:'JetBrains Mono',monospace;font-size:12px}
+.its-table tr:last-child td{border-bottom:none}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ts);font-size:11px;letter-spacing:1px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--cbr)}
+
+/* FOOTER */
+.footer{text-align:center;padding:20px 16px;color:var(--ts);font-size:11px;border-top:1px solid var(--cbr);margin-top:8px;max-width:780px;margin-left:auto;margin-right:auto}
+.footer strong{color:var(--gold)}
+
+/* DOWNLOAD BUTTONS */
+.dl-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn-dl{padding:8px 14px;border-radius:var(--rs);border:none;font-family:'Exo 2',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;letter-spacing:0.3px}
+.btn-dl-png{background:rgba(0,212,255,0.15);color:var(--cyan);border:1px solid var(--cyan)}
+.btn-dl-pdf{background:rgba(239,68,68,0.15);color:#ff7979;border:1px solid #ff7979}
+.btn-dl-xlsx{background:rgba(16,185,129,0.15);color:var(--success);border:1px solid var(--success)}
+.btn-dl:hover{transform:translateY(-1px);opacity:0.9}
+
+@media(max-width:500px){
+  .rg{grid-template-columns:1fr}
+  .logo-text{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-row">
+    <div class="logo-pi">π</div>
+    <div class="logo-text">TU<span>TO</span>YA</div>
+  </div>
+  <div class="header-sub">Simulador de Cálculo</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab active" onclick="switchTab(0)">📈 Graficador</button>
+    <button class="tab" onclick="switchTab(1)">📐 Recta Tangente</button>
+    <button class="tab" onclick="switchTab(2)">🎯 Optimización</button>
+    <button class="tab" onclick="switchTab(3)">∫ Área bajo curva</button>
+    <button class="tab" onclick="switchTab(4)">∫∫ Área entre curvas</button>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ── PANEL 1: GRAFICADOR ───────────────────────────────────── -->
+<div class="panel active" id="panel-0">
+  <div class="card">
+    <div class="step-badge"><div class="step-num">1</div>Ingresa la función</div>
+    <div class="input-row">
+      <span class="lbl">f(x) =</span>
+      <input class="mi" id="g-func" placeholder="x^2" value="x^2">
+    </div>
+    <div class="input-row">
+      <span class="lbl">x desde</span>
+      <input class="ni" id="g-xmin" value="-5">
+      <span class="lbl" style="min-width:30px;text-align:center">hasta</span>
+      <input class="ni" id="g-xmax" value="5">
+    </div>
+    <div style="font-size:11px;color:var(--ts);margin-bottom:4px">⚡ Ejemplos:</div>
+    <div class="chips">
+      <span class="chip" onclick="sf('g-func','x^2')">x²</span>
+      <span class="chip" onclick="sf('g-func','x^3-3*x')">x³−3x</span>
+      <span class="chip" onclick="sf('g-func','sin(x)')">sin(x)</span>
+      <span class="chip" onclick="sf('g-func','cos(x)')">cos(x)</span>
+      <span class="chip" onclick="sf('g-func','exp(x)')">eˣ</span>
+      <span class="chip" onclick="sf('g-func','ln(x)')">ln(x)</span>
+      <span class="chip" onclick="sf('g-func','1/x')">1/x</span>
+      <span class="chip" onclick="sf('g-func','sqrt(x)')">√x</span>
+      <span class="chip" onclick="sf('g-func','tan(x)')">tan(x)</span>
+    </div>
+    <button class="btn btn-gold" onclick="graficar()">📊 Analizar función</button>
+  </div>
+
+  <div class="card" id="g-result" style="display:none">
+    <div class="step-badge"><div class="step-num">2</div>Resultado del análisis</div>
+    <div class="rg">
+      <div class="rb"><div class="rl">Función f(x)</div><div class="rv" id="g-rf">—</div></div>
+      <div class="rb c"><div class="rl">Derivada f'(x)</div><div class="rv" id="g-rdf">—</div></div>
+      <div class="rb"><div class="rl">f(0)</div><div class="rv" id="g-f0">—</div></div>
+      <div class="rb c"><div class="rl">f'(0) pendiente</div><div class="rv" id="g-df0">—</div></div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="g-canvas" width="740" height="380"></canvas>
+    </div>
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#F5C518"></div>f(x)</div>
+      <div class="li"><div class="ld" style="background:#00D4FF"></div>f'(x)</div>
+      <div class="li"><div class="ld" style="background:#10B981"></div>Punto x</div>
+    </div>
+    <div class="dl-row">
+      <button class="btn-dl btn-dl-png" onclick="dlPNG('g-canvas','funcion')">⬇ PNG</button>
+      <button class="btn-dl btn-dl-pdf" onclick="dlPDFGraficador()">⬇ PDF</button>
+      <button class="btn-dl btn-dl-xlsx" onclick="dlXLSXGraficador()">⬇ Excel</button>
+    </div>
+    <div class="sw">
+      <div class="sl-lbl">x = <span class="v" id="g-sv">0</span></div>
+      <input type="range" id="g-slider" min="-5" max="5" step="0.1" value="0" oninput="updateSlider()">
+    </div>
+    <div class="rg">
+      <div class="rb"><div class="rl">f(x) en ese punto</div><div class="rv" id="g-fx">—</div></div>
+      <div class="rb c"><div class="rl">f'(x) pendiente</div><div class="rv" id="g-dfx">—</div></div>
+    </div>
+    <div class="tuto">
+      <div class="tuto-av">π</div>
+      <div class="tuto-txt" id="g-tip">Mueve el deslizador para ver cómo cambia la pendiente en cada punto de la curva.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PANEL 2: RECTA TANGENTE ───────────────────────────────── -->
+<div class="panel" id="panel-1">
+  <div class="card">
+    <div class="step-badge"><div class="step-num">1</div>Define la función y el punto</div>
+    <div class="input-row">
+      <span class="lbl">f(x) =</span>
+      <input class="mi" id="t-func" placeholder="x^2" value="x^2">
+    </div>
+    <div class="input-row">
+      <span class="lbl">x₀ =</span>
+      <input class="ni" id="t-x0" value="1">
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="sf('t-func','x^2')">x²</span>
+      <span class="chip" onclick="sf('t-func','x^3')">x³</span>
+      <span class="chip" onclick="sf('t-func','sin(x)')">sin(x)</span>
+      <span class="chip" onclick="sf('t-func','exp(x)')">eˣ</span>
+      <span class="chip" onclick="sf('t-func','ln(x)')">ln(x)</span>
+    </div>
+    <button class="btn btn-gold" onclick="calcTangente()" style="margin-top:10px">📐 Calcular recta tangente</button>
+  </div>
+
+  <div class="card" id="t-result" style="display:none">
+    <div class="step-badge"><div class="step-num">2</div>Recta tangente calculada</div>
+    <div class="rg">
+      <div class="rb"><div class="rl">Punto de tangencia</div><div class="rv" id="t-punto">—</div></div>
+      <div class="rb c"><div class="rl">Pendiente m = f'(x₀)</div><div class="rv" id="t-m">—</div></div>
+    </div>
+    <div class="ibox" style="margin-bottom:12px">
+      <p><strong>Ecuación de la recta tangente:</strong></p>
+      <code class="formula" id="t-eq">y = m(x − x₀) + f(x₀)</code>
+      <p><strong>¿Por qué importa?</strong> La derivada f'(x₀) es exactamente la pendiente de esta recta. Eso es lo que mide la derivada: la tasa de cambio instantánea en el punto x₀.</p>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="t-canvas" width="740" height="380"></canvas>
+    </div>
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#F5C518"></div>f(x)</div>
+      <div class="li"><div class="ld" style="background:#EF4444"></div>Recta tangente</div>
+      <div class="li"><div class="ld" style="background:#10B981;width:10px;height:10px;border-radius:50%"></div>Punto x₀</div>
+    </div>
+    <div class="dl-row">
+      <button class="btn-dl btn-dl-png" onclick="dlPNG('t-canvas','recta-tangente')">⬇ PNG</button>
+      <button class="btn-dl btn-dl-pdf" onclick="dlPDFTangente()">⬇ PDF</button>
+    </div>
+    <div class="sw">
+      <div class="sl-lbl">x₀ = <span class="v" id="t-sv">1</span></div>
+      <input type="range" id="t-slider" min="-4" max="4" step="0.1" value="1" oninput="updateTSlider()">
+    </div>
+    <div class="tuto">
+      <div class="tuto-av">π</div>
+      <div class="tuto-txt">Arrastra el deslizador y observa cómo la recta roja <strong>gira según la pendiente</strong> en cada punto. Donde la curva sube rápido, la recta es más inclinada.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PANEL 3: OPTIMIZACIÓN ─────────────────────────────────── -->
+<div class="panel" id="panel-2">
+  <div class="card">
+    <div class="step-badge"><div class="step-num">1</div>Ingresa la función y el rango</div>
+    <div class="input-row">
+      <span class="lbl">f(x) =</span>
+      <input class="mi" id="o-func" placeholder="x^3-3*x" value="x^3-3*x">
+    </div>
+    <div class="input-row">
+      <span class="lbl">Rango</span>
+      <input class="ni" id="o-xmin" value="-3">
+      <span class="lbl" style="min-width:20px;text-align:center">a</span>
+      <input class="ni" id="o-xmax" value="3">
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="sf('o-func','x^3-3*x')">x³−3x</span>
+      <span class="chip" onclick="sf('o-func','x^2-4*x+3')">x²−4x+3</span>
+      <span class="chip" onclick="sf('o-func','-x^2+4')">−x²+4</span>
+      <span class="chip" onclick="sf('o-func','x^4-4*x^2')">x⁴−4x²</span>
+      <span class="chip" onclick="sf('o-func','sin(x)')">sin(x)</span>
+    </div>
+    <button class="btn btn-gold" onclick="calcOpt()" style="margin-top:10px">🎯 Encontrar máximos y mínimos</button>
+  </div>
+
+  <div class="card" id="o-result" style="display:none">
+    <div class="step-badge"><div class="step-num">2</div>Gráfica con puntos críticos</div>
+    <div class="canvas-wrap">
+      <canvas id="o-canvas" width="740" height="380"></canvas>
+    </div>
+    <div class="dl-row">
+      <button class="btn-dl btn-dl-png" onclick="dlPNG('o-canvas','optimizacion')">⬇ PNG</button>
+      <button class="btn-dl btn-dl-pdf" onclick="dlPDFOpt()">⬇ PDF</button>
+    </div>
+    <div class="step-badge" style="margin-top:14px"><div class="step-num">3</div>Análisis detallado</div>
+    <div id="o-list"></div>
+    <div class="ibox" style="margin-top:10px">
+      <p><strong>¿Cómo se determina el tipo de punto?</strong></p>
+      <code class="formula">Paso 1: Resolver f'(x) = 0 → candidatos
+Paso 2: Evaluar f''(x) en cada candidato
+  f''(x) &lt; 0 → Máximo local ▼ (cóncavo ↓)
+  f''(x) &gt; 0 → Mínimo local ▲ (cóncavo ↑)
+  f''(x) ≈ 0 → Punto de inflexión ◆</code>
+    </div>
+  </div>
+</div>
+
+<!-- ── PANEL 4: ÁREA BAJO CURVA ──────────────────────────────── -->
+<div class="panel" id="panel-3">
+  <div class="card">
+    <div class="step-badge"><div class="step-num">1</div>Define la función y los límites</div>
+    <div class="ibox" style="margin-bottom:12px">
+      <p><strong>¿Qué calcula?</strong> La integral definida mide el área entre la curva f(x) y el eje X en el intervalo [a, b].</p>
+      <code class="formula">∫ₐᵇ f(x) dx = F(b) − F(a)</code>
+      <p>Las zonas <strong style="color:#10B981">verdes</strong> están sobre el eje X (positivas). Las zonas <strong style="color:#EF4444">rojas</strong> están bajo el eje X (negativas).</p>
+    </div>
+    <div class="input-row">
+      <span class="lbl">f(x) =</span>
+      <input class="mi" id="a-func" placeholder="x^2" value="x^2">
+    </div>
+    <div class="input-row">
+      <span class="lbl">a =</span>
+      <input class="ni" id="a-inf" value="0">
+      <span class="lbl" style="min-width:25px;text-align:center">b =</span>
+      <input class="ni" id="a-sup" value="3">
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="sf('a-func','x^2')">x²</span>
+      <span class="chip" onclick="sf('a-func','sin(x)')">sin(x)</span>
+      <span class="chip" onclick="sf('a-func','x^3-x')">x³−x</span>
+      <span class="chip" onclick="sf('a-func','exp(x)')">eˣ</span>
+      <span class="chip" onclick="sf('a-func','2*x+1')">2x+1</span>
+    </div>
+    <button class="btn btn-gold" onclick="calcArea()" style="margin-top:10px">∫ Calcular área</button>
+  </div>
+
+  <div class="card" id="a-result" style="display:none">
+    <div class="step-badge"><div class="step-num">2</div>Resultado</div>
+    <div class="rg">
+      <div class="rb g"><div class="rl">Área total |∫f(x)dx|</div><div class="rv" id="a-abs">—</div></div>
+      <div class="rb c"><div class="rl">Integral neta ∫f(x)dx</div><div class="rv" id="a-net">—</div></div>
+    </div>
+    <div class="ibox" style="margin-bottom:12px">
+      <p><strong>Área total:</strong> suma de todas las regiones (+ y − como positivas) → área física real</p>
+      <p><strong>Integral neta:</strong> área sobre el eje X <em>menos</em> área bajo el eje X → puede ser negativa</p>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="a-canvas" width="740" height="380"></canvas>
+    </div>
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#F5C518"></div>f(x)</div>
+      <div class="li"><div class="ld" style="background:rgba(16,185,129,0.7);height:10px"></div>Área positiva</div>
+      <div class="li"><div class="ld" style="background:rgba(239,68,68,0.7);height:10px"></div>Área negativa</div>
+    </div>
+    <div class="dl-row">
+      <button class="btn-dl btn-dl-png" onclick="dlPNG('a-canvas','area-bajo-curva')">⬇ PNG</button>
+      <button class="btn-dl btn-dl-pdf" onclick="dlPDFArea()">⬇ PDF</button>
+      <button class="btn-dl btn-dl-xlsx" onclick="dlXLSXArea()">⬇ Excel</button>
+    </div>
+    <div class="sbox" id="a-method">
+      <div class="sbox-title" id="a-method-title">💡 Método</div>
+      <div id="a-method-content"></div>
+    </div>
+    <div class="tuto" style="margin-top:10px">
+      <div class="tuto-av">π</div>
+      <div class="tuto-txt" id="a-tip">El área bajo la curva representa la acumulación total de f(x) en el intervalo dado.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PANEL 5: ÁREA ENTRE CURVAS ────────────────────────────── -->
+<div class="panel" id="panel-4">
+  <div class="card">
+    <div class="step-badge"><div class="step-num">1</div>Ingresa las dos funciones</div>
+    <div class="ibox" style="margin-bottom:12px">
+      <p><strong>¿Qué calcula?</strong> El área encerrada entre dos curvas f(x) y g(x). Primero encontramos dónde se intersectan, luego calculamos el área.</p>
+      <code class="formula">A = ∫ₐᵇ |f(x) − g(x)| dx</code>
+    </div>
+    <div class="input-row">
+      <span class="lbl">f(x) =</span>
+      <input class="mi" id="ac-f" placeholder="x^2" value="x^2">
+    </div>
+    <div class="input-row">
+      <span class="lbl">g(x) =</span>
+      <input class="mi" id="ac-g" placeholder="x+2" value="x+2">
+    </div>
+    <div class="chips">
+      <span class="chip" onclick="sfs('x^2','x+2')">x² y x+2</span>
+      <span class="chip" onclick="sfs('x^2','4')">x² y 4</span>
+      <span class="chip" onclick="sfs('sin(x)','cos(x)')">sin y cos</span>
+      <span class="chip" onclick="sfs('x^3','x')">x³ y x</span>
+    </div>
+    <button class="btn btn-gold" onclick="findIts()" style="margin-top:10px">🔍 Encontrar intersecciones</button>
+  </div>
+
+  <!-- STEP 2: INTERSECTIONS -->
+  <div class="card" id="ac-step2" style="display:none">
+    <div class="step-badge"><div class="step-num">2</div>Intersecciones encontradas</div>
+    <div class="canvas-wrap">
+      <canvas id="ac-prev-canvas" width="740" height="300"></canvas>
+    </div>
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#F5C518"></div>f(x)</div>
+      <div class="li"><div class="ld" style="background:#00D4FF"></div>g(x)</div>
+      <div class="li"><div class="ld" style="background:#fff;width:10px;height:10px;border-radius:50%"></div>Intersección</div>
+    </div>
+    <div id="ac-its-info"></div>
+
+    <div class="divider">Define el intervalo de integración</div>
+
+    <div class="input-row" style="margin-top:4px">
+      <span class="lbl">a =</span>
+      <input class="ni" id="ac-xmin" value="-2">
+      <span class="lbl" style="min-width:25px;text-align:center">b =</span>
+      <input class="ni" id="ac-xmax" value="2">
+    </div>
+    <div id="ac-range-hint" class="tuto" style="margin-bottom:12px">
+      <div class="tuto-av">π</div>
+      <div class="tuto-txt" id="ac-hint-txt">Puedes usar el rango sugerido o ajustarlo manualmente.</div>
+    </div>
+    <button class="btn btn-gold" onclick="calcAreaCurvas()">∫∫ Calcular área entre curvas</button>
+  </div>
+
+  <!-- STEP 3: RESULT -->
+  <div class="card" id="ac-step3" style="display:none">
+    <div class="step-badge"><div class="step-num">3</div>Área entre las curvas</div>
+    <div class="rg">
+      <div class="rb g"><div class="rl">Área entre curvas</div><div class="rv" id="ac-area">—</div></div>
+      <div class="rb c"><div class="rl">Intersecciones en x</div><div class="rv" id="ac-its">—</div></div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="ac-canvas" width="740" height="380"></canvas>
+    </div>
+    <div class="legend">
+      <div class="li"><div class="ld" style="background:#F5C518"></div>f(x)</div>
+      <div class="li"><div class="ld" style="background:#00D4FF"></div>g(x)</div>
+      <div class="li"><div class="ld" style="background:rgba(245,197,24,0.5);height:10px"></div>Área entre curvas</div>
+    </div>
+    <div class="dl-row">
+      <button class="btn-dl btn-dl-png" onclick="dlPNG('ac-canvas','area-entre-curvas')">⬇ PNG</button>
+      <button class="btn-dl btn-dl-pdf" onclick="dlPDFAreaCurvas()">⬇ PDF</button>
+    </div>
+      <div id="ac-explain"></div>
+    </div>
+    <div id="ac-warn" class="wbox" style="display:none;margin-top:10px">
+      <div class="wbox-title">⚠️ Considera integrar respecto a Y</div>
+      <div id="ac-warn-txt" style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6"></div>
+    </div>
+    <div style="margin-top:12px;text-align:center">
+      <button class="btn btn-outline" onclick="resetAC()">← Cambiar rango</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end page -->
+
+<div class="footer">
+  <strong>TUTOYA</strong> · Simulador de Cálculo · Herramienta educativa<br>
+  <span style="color:rgba(255,255,255,0.35)">© 2025 TUTOYA — Matemáticas para todos</span>
+</div>
+
+<script>
+// ── CORE ───────────────────────────────────────────────────────
+function ev(expr,x){
+  try{
+    let e=expr.trim();
+    // Math functions
+    e=e.replace(/\bln\b/g,'Math.log').replace(/\bsin\b/g,'Math.sin')
+       .replace(/\bcos\b/g,'Math.cos').replace(/\btan\b/g,'Math.tan')
+       .replace(/\bexp\b/g,'Math.exp').replace(/\bsqrt\b/g,'Math.sqrt')
+       .replace(/\babs\b/g,'Math.abs');
+    // Powers
+    e=e.replace(/\^/g,'**');
+    // Implicit multiplication: 2x -> 2*x
+    e=e.replace(/(\d+\.?\d*)\s*x\b/g,'$1*x');
+    // Substitute x with value in parentheses
+    e=e.replace(/\bx\b/g,'('+x+')');
+    // Fix unary minus before **: JS doesn't allow -(n)** 
+    // Add 0 prefix if starts with minus
+    if(e.trim().startsWith('-')) e='0'+e;
+    // Fix pattern after operators: +-(n)** 
+    e=e.replace(/([+\-*/(,])\s*-\s*([(]-?[\d.]+[)])\s*\*\*/g,'$1(0-$2)**');
+    const r=Function('"use strict";return('+e+')')();
+    return isFinite(r)?r:null;
+  }catch{return null;}
+}
+function nd(e,x,h=0.0001){const a=ev(e,x+h),b=ev(e,x-h);return(a!==null&&b!==null)?(a-b)/(2*h):null;}
+function nd2(e,x,h=0.001){const a=ev(e,x+h),b=ev(e,x),c=ev(e,x-h);return(a!==null&&b!==null&&c!==null)?(a-2*b+c)/(h*h):null;}
+function derivar(expr){
+  const e=expr.trim().replace(/\s+/g,'');
+  if(e==='x')return'1';if(e==='sin(x)')return'cos(x)';if(e==='cos(x)')return'-sin(x)';
+  if(e==='tan(x)')return'1/cos(x)^2';if(e==='exp(x)')return'exp(x)';
+  if(e==='ln(x)')return'1/x';if(e==='sqrt(x)')return'1/(2*sqrt(x))';if(e==='1/x')return'-1/x^2';
+  const m1=e.match(/^(-?\d*\.?\d*)\*?x\^(\d+)$/);
+  if(m1){const a=parseFloat(m1[1]||'1'),n=parseInt(m1[2]),c=a*n,nn=n-1;
+    if(nn===0)return String(c);if(nn===1)return`${c}*x`;return`${c}*x^${nn}`;}
+  const m2=e.match(/^x\^(\d+)$/);
+  if(m2){const n=parseInt(m2[1]);return n===2?'2*x':`${n}*x^${n-1}`;}
+  const m3=e.match(/^(-?\d+\.?\d*)\*?x$/);if(m3)return m3[1];
+  if(e.match(/^\d+\.?\d*$/))return'0';
+  return`f'(${expr})`;
+}
+function fmt(n,d=3){if(n===null)return'—';return parseFloat(n.toFixed(d)).toString();}
+function sf(id,v){document.getElementById(id).value=v;}
+function sfs(f,g){document.getElementById('ac-f').value=f;document.getElementById('ac-g').value=g;}
+function switchTab(i){
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',i===j));
+}
+
+// ── SMART Y RANGE ──────────────────────────────────────────────
+function yRange(exprs,xmin,xmax,N=400,includeZero=true){
+  const ys=[];
+  exprs.forEach(expr=>{
+    for(let i=0;i<=N;i++){
+      const x=xmin+(xmax-xmin)*i/N,y=ev(expr,x);
+      if(y!==null)ys.push(y);
+    }
+  });
+  if(!ys.length)return[-5,5];
+  if(includeZero)ys.push(0);
+  ys.sort((a,b)=>a-b);
+  const q1=ys[Math.floor(ys.length*0.04)],q3=ys[Math.floor(ys.length*0.96)];
+  const iqr=Math.max(q3-q1,1),m=iqr*0.25;
+  return[q1-m,q3+m];
+}
+
+// ── CANVAS ─────────────────────────────────────────────────────
+function setupC(id,xmin,xmax,ymin,ymax){
+  const canvas=document.getElementById(id);
+  const W=canvas.width,H=canvas.height;
+  const ctx=canvas.getContext('2d');
+  const pad={l:52,r:18,t:18,b:36};
+  const pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+  const cx=x=>pad.l+(x-xmin)/(xmax-xmin)*pw;
+  const cy=y=>H-pad.b-(y-ymin)/(ymax-ymin)*ph;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='rgba(0,0,0,0.85)';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+  for(let i=0;i<=6;i++){
+    const gx=pad.l+pw*i/6,gy=pad.t+ph*i/6;
+    ctx.beginPath();ctx.moveTo(gx,pad.t);ctx.lineTo(gx,H-pad.b);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(pad.l,gy);ctx.lineTo(W-pad.r,gy);ctx.stroke();
+  }
+  ctx.strokeStyle='rgba(255,255,255,0.22)';ctx.lineWidth=1.5;
+  const y0=cy(0),x0=cx(0);
+  if(y0>=pad.t&&y0<=H-pad.b){ctx.beginPath();ctx.moveTo(pad.l,y0);ctx.lineTo(W-pad.r,y0);ctx.stroke();}
+  if(x0>=pad.l&&x0<=W-pad.r){ctx.beginPath();ctx.moveTo(x0,pad.t);ctx.lineTo(x0,H-pad.b);ctx.stroke();}
+  ctx.fillStyle='rgba(255,255,255,0.4)';ctx.font='10px JetBrains Mono,monospace';
+  for(let i=0;i<=4;i++){
+    const xv=xmin+(xmax-xmin)*i/4;
+    ctx.textAlign='center';ctx.fillText(fmt(xv,1),cx(xv),H-pad.b+14);
+  }
+  ctx.textAlign='right';
+  for(let i=0;i<=4;i++){
+    const yv=ymin+(ymax-ymin)*i/4;
+    ctx.fillText(fmt(yv,1),pad.l-5,cy(yv)+4);
+  }
+  return{ctx,cx,cy,W,H,pad};
+}
+
+function drawCurve(ctx,cx,cy,expr,xmin,xmax,color,dash=[],lw=2.5){
+  ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.setLineDash(dash);
+  ctx.beginPath();let first=true,prev=null;
+  for(let i=0;i<=500;i++){
+    const x=xmin+(xmax-xmin)*i/500,y=ev(expr,x);
+    if(y===null){first=true;continue;}
+    const px=cx(x),py=cy(y);
+    if(first||(prev!==null&&Math.abs(y-prev)>80)){ctx.moveTo(px,py);first=false;}
+    else ctx.lineTo(px,py);
+    prev=y;
+  }
+  ctx.stroke();ctx.setLineDash([]);
+}
+
+// ── GRAFICADOR ─────────────────────────────────────────────────
+let gSt=null;
+function graficar(){
+  const expr=document.getElementById('g-func').value.trim();
+  const xmin=parseFloat(document.getElementById('g-xmin').value)||-5;
+  const xmax=parseFloat(document.getElementById('g-xmax').value)||5;
+  if(ev(expr,1)===null&&ev(expr,2)===null){alert('Función no válida. Prueba: x^2, sin(x), ln(x)');return;}
+  const deriv=derivar(expr);
+  document.getElementById('g-rf').textContent=expr;
+  document.getElementById('g-rdf').textContent=deriv;
+  document.getElementById('g-f0').textContent=fmt(ev(expr,0));
+  document.getElementById('g-df0').textContent=fmt(nd(expr,0));
+  document.getElementById('g-result').style.display='block';
+  const[ymin,ymax]=yRange([expr,deriv],xmin,xmax);
+  gSt={expr,deriv,xmin,xmax,ymin,ymax};
+  const sl=document.getElementById('g-slider');
+  sl.min=xmin;sl.max=xmax;sl.value=(xmin+xmax)/2;
+  drawG();updateSlider();
+  const tips={'x^2':'En x²: la derivada 2x es 0 en x=0 (mínimo). Cuando 2x>0 la función sube, cuando 2x<0 baja.',
+    'sin(x)':'Donde seno llega al máximo/mínimo, su derivada cos(x) vale 0. ¡Mueve el deslizador para verlo!',
+    'exp(x)':'eˣ es única: es igual a su propia derivada. La pendiente siempre es igual al valor de la función.',
+    'ln(x)':'Solo existe para x>0. Su derivada 1/x es siempre positiva — siempre crece, pero cada vez más lento.'};
+  document.getElementById('g-tip').textContent=tips[expr]||`La derivada f'(x) = ${deriv} es la pendiente en cada punto.`;
+}
+function drawG(sx=null){
+  if(!gSt)return;
+  const{expr,deriv,xmin,xmax,ymin,ymax}=gSt;
+  const{ctx,cx,cy,H}=setupC('g-canvas',xmin,xmax,ymin,ymax);
+  drawCurve(ctx,cx,cy,deriv,xmin,xmax,'rgba(0,212,255,0.8)',[6,3]);
+  drawCurve(ctx,cx,cy,expr,xmin,xmax,'#F5C518');
+  if(sx!==null){
+    const fy=ev(expr,sx),dfy=ev(deriv,sx),px=cx(sx);
+    ctx.strokeStyle='rgba(16,185,129,0.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(px,18);ctx.lineTo(px,H-36);ctx.stroke();ctx.setLineDash([]);
+    if(fy!==null){ctx.fillStyle='#F5C518';ctx.beginPath();ctx.arc(px,cy(fy),5,0,Math.PI*2);ctx.fill();}
+    if(dfy!==null){ctx.fillStyle='#00D4FF';ctx.beginPath();ctx.arc(px,cy(dfy),5,0,Math.PI*2);ctx.fill();}
+  }
+}
+function updateSlider(){
+  if(!gSt)return;
+  const x=parseFloat(document.getElementById('g-slider').value);
+  document.getElementById('g-sv').textContent=fmt(x,2);
+  document.getElementById('g-fx').textContent=fmt(ev(gSt.expr,x));
+  document.getElementById('g-dfx').textContent=fmt(ev(gSt.deriv,x));
+  drawG(x);
+}
+
+// ── RECTA TANGENTE ─────────────────────────────────────────────
+let tSt=null;
+function calcTangente(){
+  const expr=document.getElementById('t-func').value.trim();
+  const x0=parseFloat(document.getElementById('t-x0').value)||0;
+  const fx0=ev(expr,x0),dfx0=nd(expr,x0);
+  if(fx0===null){alert('Función no válida en x₀');return;}
+  document.getElementById('t-punto').textContent=`(${fmt(x0,2)}, ${fmt(fx0,2)})`;
+  document.getElementById('t-m').textContent=fmt(dfx0);
+  const m=dfx0||0,b=fx0-m*x0,sign=b>=0?'+':'-';
+  document.getElementById('t-eq').textContent=`y = ${fmt(m,3)}x ${sign} ${fmt(Math.abs(b),3)}`;
+  document.getElementById('t-result').style.display='block';
+  document.getElementById('t-slider').value=x0;
+  document.getElementById('t-sv').textContent=fmt(x0,2);
+  tSt={expr,x0};drawT(x0);
+}
+function drawT(x0){
+  if(!tSt)return;
+  const{expr}=tSt,xmin=-5,xmax=5;
+  const[ymin,ymax]=yRange([expr],xmin,xmax);
+  const{ctx,cx,cy}=setupC('t-canvas',xmin,xmax,ymin,ymax);
+  const m=nd(expr,x0)||0,b=(ev(expr,x0)||0)-m*x0;
+  ctx.strokeStyle='rgba(239,68,68,0.9)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(cx(xmin),cy(m*xmin+b));ctx.lineTo(cx(xmax),cy(m*xmax+b));ctx.stroke();
+  drawCurve(ctx,cx,cy,expr,xmin,xmax,'#F5C518');
+  const fx0=ev(expr,x0);
+  if(fx0!==null){
+    ctx.shadowColor='#10B981';ctx.shadowBlur=12;
+    ctx.fillStyle='#10B981';ctx.strokeStyle='#fff';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx(x0),cy(fx0),7,0,Math.PI*2);
+    ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  }
+}
+function updateTSlider(){
+  const x0=parseFloat(document.getElementById('t-slider').value);
+  document.getElementById('t-sv').textContent=fmt(x0,2);
+  if(tSt){
+    tSt.x0=x0;
+    const fx0=ev(tSt.expr,x0),dfx0=nd(tSt.expr,x0);
+    document.getElementById('t-punto').textContent=`(${fmt(x0,2)}, ${fmt(fx0,2)})`;
+    document.getElementById('t-m').textContent=fmt(dfx0);
+    const m=dfx0||0,b=(fx0||0)-m*x0,sign=b>=0?'+':'-';
+    document.getElementById('t-eq').textContent=`y = ${fmt(m,3)}x ${sign} ${fmt(Math.abs(b),3)}`;
+    drawT(x0);
+  }
+}
+
+// ── OPTIMIZACIÓN ───────────────────────────────────────────────
+function calcOpt(){
+  const expr=document.getElementById('o-func').value.trim();
+  const xmin=parseFloat(document.getElementById('o-xmin').value)||-3;
+  const xmax=parseFloat(document.getElementById('o-xmax').value)||3;
+  const[yr1,yr2]=yRange([expr],xmin,xmax);
+  const{ctx,cx,cy}=setupC('o-canvas',xmin,xmax,yr1,yr2);
+  drawCurve(ctx,cx,cy,expr,xmin,xmax,'#F5C518');
+  const N=3000,cps=[];
+  let prevD=nd(expr,xmin);
+  for(let i=1;i<=N;i++){
+    const x=xmin+(xmax-xmin)*i/N,d=nd(expr,x);
+    if(prevD!==null&&d!==null&&prevD*d<0){
+      let lo=x-(xmax-xmin)/N,hi=x;
+      for(let k=0;k<50;k++){const m=(lo+hi)/2,dm=nd(expr,m);if(dm===null)break;if(dm*prevD<0)hi=m;else lo=m;}
+      const xc=(lo+hi)/2,fc=ev(expr,xc),d2=nd2(expr,xc);
+      let type='inf';
+      if(d2!==null){if(d2<-0.01)type='max';else if(d2>0.01)type='min';}
+      if(!cps.some(p=>Math.abs(p.x-xc)<0.05))cps.push({x:xc,y:fc,type,d2});
+    }
+    prevD=d;
+  }
+  cps.forEach(cp=>{
+    const color=cp.type==='max'?'#EF4444':cp.type==='min'?'#10B981':'#F5C518';
+    const sym=cp.type==='max'?'▼MAX':cp.type==='min'?'▲MIN':'◆INF';
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(cx(cp.x),18);ctx.lineTo(cx(cp.x),cy(cp.y||0));ctx.stroke();ctx.setLineDash([]);
+    ctx.shadowColor=color;ctx.shadowBlur=12;
+    ctx.fillStyle=color;ctx.strokeStyle='#fff';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx(cp.x),cy(cp.y||0),8,0,Math.PI*2);
+    ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+    ctx.fillStyle='#fff';ctx.font='bold 11px Exo 2,sans-serif';ctx.textAlign='center';
+    ctx.fillText(sym,cx(cp.x),cy(cp.y||0)+(cp.type==='max'?-18:18));
+  });
+  const listEl=document.getElementById('o-list');listEl.innerHTML='';
+  if(!cps.length){
+    listEl.innerHTML=`<div class="tuto"><div class="tuto-av">π</div>
+      <div class="tuto-txt">No encontré puntos críticos en este rango. Prueba con <strong>x³−3x</strong> o amplía el rango.</div></div>`;
+  } else {
+    cps.forEach(cp=>{
+      const tl=cp.type==='max'?'Máximo local':cp.type==='min'?'Mínimo local':'Punto de inflexión';
+      const razon=cp.type==='max'?"f''(x) = "+fmt(cp.d2)+" < 0 → cóncavo hacia abajo":
+                  cp.type==='min'?"f''(x) = "+fmt(cp.d2)+" > 0 → cóncavo hacia arriba":
+                  "f''(x) ≈ 0 → posible punto de inflexión";
+      listEl.innerHTML+=`<div class="cp-item">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span class="cp-badge ${cp.type}">${tl}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px">x = ${fmt(cp.x,4)}</span>
+        </div>
+        <div class="rg" style="margin-bottom:6px">
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px">
+            <div class="rl">f(x) en el punto</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#F5C518">${fmt(cp.y,4)}</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px">
+            <div class="rl">Segunda derivada f''(x)</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#00D4FF">${fmt(cp.d2,4)}</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--ts);font-style:italic">${razon}</div>
+      </div>`;
+    });
+  }
+  document.getElementById('o-result').style.display='block';
+}
+
+// ── ÁREA BAJO CURVA ────────────────────────────────────────────
+function calcArea(){
+  const expr=document.getElementById('a-func').value.trim();
+  const a=parseFloat(document.getElementById('a-inf').value)||0;
+  const b=parseFloat(document.getElementById('a-sup').value)||3;
+  const margin=(b-a)*0.18;
+  const xmin=a-margin,xmax=b+margin;
+  const[yr1,yr2]=yRange([expr],a,b);
+  const ymin=Math.min(yr1,0),ymax=Math.max(yr2,0);
+  const{ctx,cx,cy}=setupC('a-canvas',xmin,xmax,ymin,ymax);
+  const N=800,dx=(b-a)/N;
+  let aPos=0,aNeg=0;
+  for(let i=0;i<N;i++){
+    const x1=a+dx*i,x2=a+dx*(i+1);
+    const y1=ev(expr,x1)||0,y2=ev(expr,x2)||0,avg=(y1+y2)/2;
+    ctx.beginPath();
+    ctx.moveTo(cx(x1),cy(0));ctx.lineTo(cx(x1),cy(y1));
+    ctx.lineTo(cx(x2),cy(y2));ctx.lineTo(cx(x2),cy(0));ctx.closePath();
+    if(avg>=0){ctx.fillStyle='rgba(16,185,129,0.35)';aPos+=avg*dx;}
+    else{ctx.fillStyle='rgba(239,68,68,0.35)';aNeg+=avg*dx;}
+    ctx.fill();
+  }
+  drawCurve(ctx,cx,cy,expr,xmin,xmax,'#F5C518');
+  [a,b].forEach(lim=>{
+    ctx.strokeStyle='rgba(245,197,24,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(cx(lim),18);ctx.lineTo(cx(lim),cy(0));ctx.stroke();ctx.setLineDash([]);
+  });
+  document.getElementById('a-abs').textContent=fmt(aPos-aNeg,4);
+  document.getElementById('a-net').textContent=fmt(aPos+aNeg,4);
+  suggestMethod(expr);
+  const tip=aNeg<-0.001?`¡Hay área por debajo del eje X (roja)! La integral neta es menor que el área total absoluta.`:
+    `Toda el área está sobre el eje X, por lo que la integral neta y el área total son iguales.`;
+  document.getElementById('a-tip').textContent=tip;
+  document.getElementById('a-result').style.display='block';
+}
+
+function suggestMethod(expr){
+  const e=expr.toLowerCase();
+  let method='',steps=[];
+  if(e.includes('sin')||e.includes('cos')){
+    method='Integración directa — Función trigonométrica';
+    steps=['Identifica la función: sin(x) o cos(x)','Aplica fórmula directa:<br>∫sin(x)dx = −cos(x)+C<br>∫cos(x)dx = sin(x)+C','Evalúa F(b) − F(a)'];
+  }else if(e.includes('exp')||e.includes('e^')){
+    method='Integración directa — Función exponencial';
+    steps=['Recuerda: ∫eˣdx = eˣ + C','Si es ∫e^(ax)dx → resultado: e^(ax)/a + C','Evalúa F(b) − F(a)'];
+  }else if(e.includes('ln')||e.includes('log')){
+    method='Integración por partes — ∫ln(x)dx';
+    steps=['Usa la fórmula: ∫u·dv = u·v − ∫v·du','Elige u = ln(x) y dv = dx','du = 1/x dx , v = x','Resultado: x·ln(x) − x + C'];
+  }else if(e.includes('1/x')){
+    method='Logaritmo — ∫(1/x)dx';
+    steps=['∫(1/x)dx = ln|x| + C','¡El resultado es logarítmico, no potencia!','Evalúa: ln|b| − ln|a|'];
+  }else if(e.includes('sqrt')){
+    method='Regla de la potencia — ∫√x dx';
+    steps=['√x = x^(1/2)','Aplica: ∫xⁿdx = xⁿ⁺¹/(n+1) + C','Aquí n=1/2 → resultado: (2/3)x^(3/2) + C'];
+  }else if(e.match(/x\^\d/)||e.includes('x^')){
+    method='Regla de la potencia — ∫xⁿdx';
+    steps=['Aplica: ∫xⁿdx = xⁿ⁺¹/(n+1) + C (n ≠ −1)','Integra cada término por separado','Evalúa F(b) − F(a)'];
+  }else{
+    method='Integración directa — Función lineal o constante';
+    steps=['Para constante k: ∫k dx = kx + C','Para ax: ∫ax dx = ax²/2 + C','Evalúa F(b) − F(a)'];
+  }
+  document.getElementById('a-method-title').textContent='💡 '+method;
+  document.getElementById('a-method-content').innerHTML=
+    `<ol class="steps-list">${steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+    <div style="margin-top:8px;font-size:11px;color:var(--ts)">💡 <em>Verifica derivando tu antiderivada.</em></div>`;
+}
+
+// ── ÁREA ENTRE CURVAS ─────────────────────────────────────────
+let acState=null;
+
+function findIts(){
+  const exprF=document.getElementById('ac-f').value.trim();
+  const exprG=document.getElementById('ac-g').value.trim();
+  if(ev(exprF,0)===null){alert('f(x) no válida');return;}
+  if(ev(exprG,0)===null){alert('g(x) no válida');return;}
+
+  // Search intersections in wide range
+  const XMIN=-15,XMAX=15,its=[];
+  let prev=null,prevX=XMIN;
+  for(let i=0;i<=10000;i++){
+    const x=XMIN+(XMAX-XMIN)*i/10000;
+    const fv=ev(exprF,x),gv=ev(exprG,x);
+    if(fv===null||gv===null){prev=null;continue;}
+    const diff=fv-gv;
+    if(prev!==null&&prev*diff<0){
+      let lo=prevX,hi=x;
+      for(let k=0;k<60;k++){
+        const m=(lo+hi)/2,fm=ev(exprF,m)||0,gm=ev(exprG,m)||0;
+        if((fm-gm)*prev<0)hi=m;else lo=m;
+      }
+      const xi=(lo+hi)/2;
+      if(!its.some(p=>Math.abs(p-xi)<0.01))its.push(xi);
+    }
+    prev=diff;prevX=x;
+  }
+  its.sort((a,b)=>a-b);
+  acState={exprF,exprG,its};
+
+  // Suggest range
+  let sugXmin,sugXmax;
+  if(its.length>=2){
+    sugXmin=its[0]; sugXmax=its[its.length-1];
+  } else if(its.length===1){
+    sugXmin=its[0]-3; sugXmax=its[0]+3;
+  } else {
+    sugXmin=-3; sugXmax=3;
+  }
+
+  // Set suggested range
+  document.getElementById('ac-xmin').value=fmt(sugXmin,2);
+  document.getElementById('ac-xmax').value=fmt(sugXmax,2);
+
+  // Preview canvas
+  const xmin=sugXmin-1,xmax=sugXmax+1;
+  const[yr1,yr2]=yRange([exprF,exprG],xmin,xmax);
+  const{ctx,cx,cy}=setupC('ac-prev-canvas',xmin,xmax,yr1,yr2);
+  drawCurve(ctx,cx,cy,exprG,xmin,xmax,'#00D4FF',[5,3]);
+  drawCurve(ctx,cx,cy,exprF,xmin,xmax,'#F5C518');
+
+  // Draw intersections on preview
+  its.forEach(xi=>{
+    const yi=ev(exprF,xi)||0;
+    ctx.shadowColor='#fff';ctx.shadowBlur=8;
+    ctx.fillStyle='#fff';ctx.strokeStyle='#F5C518';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx(xi),cy(yi),6,0,Math.PI*2);
+    ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,0.9)';ctx.font='bold 10px JetBrains Mono,monospace';
+    ctx.textAlign='center';
+    ctx.fillText('x='+fmt(xi,2),cx(xi),cy(yi)-14);
+  });
+
+  // Info about intersections
+  let itsInfo='';
+  if(its.length===0){
+    itsInfo=`<div class="tuto"><div class="tuto-av">π</div>
+      <div class="tuto-txt">No encontré intersecciones en el rango [-15, 15]. Las curvas no se cruzan o están muy separadas. Puedes ajustar el rango manualmente.</div></div>`;
+    document.getElementById('ac-hint-txt').textContent='Las curvas no se intersectan. Ajusta el rango manualmente.';
+  } else {
+    const midX=(sugXmin+sugXmax)/2;
+    const fMid=ev(exprF,midX)||0,gMid=ev(exprG,midX)||0;
+    const sup=fMid>gMid?'f(x)':'g(x)', inf=fMid>gMid?'g(x)':'f(x)';
+    itsInfo=`
+      <table class="its-table">
+        <tr><th>Intersección</th><th>x</th><th>f(x) = g(x)</th></tr>
+        ${its.map((xi,i)=>`<tr><td>#${i+1}</td><td>${fmt(xi,4)}</td><td>${fmt(ev(exprF,xi),4)}</td></tr>`).join('')}
+      </table>
+      <div class="ibox" style="margin-top:10px">
+        <p>En el intervalo [${fmt(sugXmin,2)}, ${fmt(sugXmax,2)}]:</p>
+        <p><strong>${sup}</strong> está por encima de <strong>${inf}</strong></p>
+        <code class="formula">A = ∫ |f(x) − g(x)| dx</code>
+      </div>`;
+    document.getElementById('ac-hint-txt').textContent=
+      its.length>=2
+      ?`Las curvas se intersectan en x = ${its.map(x=>fmt(x,2)).join(' y ')}. Se sugiere usar ese rango.`
+      :`Se encontró 1 intersección. Ajusta el rango según lo que necesites calcular.`;
+  }
+  document.getElementById('ac-its-info').innerHTML=itsInfo;
+  document.getElementById('ac-step2').style.display='block';
+  document.getElementById('ac-step3').style.display='none';
+  document.getElementById('ac-step2').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function calcAreaCurvas(){
+  if(!acState)return;
+  const{exprF,exprG,its}=acState;
+  const xmin=parseFloat(document.getElementById('ac-xmin').value);
+  const xmax=parseFloat(document.getElementById('ac-xmax').value);
+  const[yr1,yr2]=yRange([exprF,exprG],xmin,xmax);
+  const{ctx,cx,cy}=setupC('ac-canvas',xmin,xmax,yr1,yr2);
+
+  // Fill area
+  const N=1000,dx=(xmax-xmin)/N;
+  let area=0;
+  for(let i=0;i<N;i++){
+    const x1=xmin+dx*i,x2=xmin+dx*(i+1);
+    const f1=ev(exprF,x1)||0,g1=ev(exprG,x1)||0;
+    const f2=ev(exprF,x2)||0,g2=ev(exprG,x2)||0;
+    area+=Math.abs(((f1-g1)+(f2-g2))/2)*dx;
+    ctx.beginPath();
+    ctx.moveTo(cx(x1),cy(f1));ctx.lineTo(cx(x2),cy(f2));
+    ctx.lineTo(cx(x2),cy(g2));ctx.lineTo(cx(x1),cy(g1));
+    ctx.closePath();ctx.fillStyle='rgba(245,197,24,0.2)';ctx.fill();
+  }
+  drawCurve(ctx,cx,cy,exprG,xmin,xmax,'#00D4FF',[5,3]);
+  drawCurve(ctx,cx,cy,exprF,xmin,xmax,'#F5C518');
+
+  // Draw intersections in range
+  const itsInRange=its.filter(xi=>xi>=xmin&&xi<=xmax);
+  itsInRange.forEach(xi=>{
+    const yi=ev(exprF,xi)||0;
+    ctx.shadowColor='#fff';ctx.shadowBlur=8;
+    ctx.fillStyle='#fff';ctx.strokeStyle='#F5C518';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(cx(xi),cy(yi),6,0,Math.PI*2);
+    ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,0.9)';ctx.font='bold 10px JetBrains Mono,monospace';
+    ctx.textAlign='center';ctx.fillText('x='+fmt(xi,2),cx(xi),cy(yi)-14);
+  });
+
+  document.getElementById('ac-area').textContent=fmt(area,4)+' u²';
+  document.getElementById('ac-its').textContent=itsInRange.length?itsInRange.map(x=>fmt(x,3)).join(', '):'Ninguna';
+
+  // Explanation
+  const midX=(xmin+xmax)/2;
+  const fMid=ev(exprF,midX)||0,gMid=ev(exprG,midX)||0;
+  const sup=fMid>gMid?'f(x)':'g(x)', inf=fMid>gMid?'g(x)':'f(x)';
+  let explainHtml='';
+  if(itsInRange.length>=2){
+    explainHtml=`<p><strong>Intervalo de integración:</strong> [${fmt(xmin,2)}, ${fmt(xmax,2)}]</p>
+      <p>Las curvas se intersectan en <strong>x = ${itsInRange.map(x=>fmt(x,3)).join(', ')}</strong></p>
+      <p>En cada subintervalo se integra la diferencia entre la curva superior e inferior.</p>
+      <code class="formula">A = ${itsInRange.length>=2?itsInRange.slice(0,-1).map((xi,i)=>`∫${fmt(xi,2)}→${fmt(itsInRange[i+1],2)} |f(x)−g(x)| dx`).join(' + '):'∫|f(x)−g(x)| dx'} = ${fmt(area,4)} u²</code>`;
+  } else {
+    explainHtml=`<p><strong>${sup}</strong> está por encima de <strong>${inf}</strong> en todo el intervalo.</p>
+      <code class="formula">A = ∫${fmt(xmin,2)}→${fmt(xmax,2)} (${sup} − ${inf}) dx = ${fmt(area,4)} u²</code>`;
+  }
+  document.getElementById('ac-explain').innerHTML=explainHtml;
+
+  // Warn about Y integration
+  const warnEl=document.getElementById('ac-warn');
+  if(itsInRange.length===0&&its.length===0){
+    warnEl.style.display='block';
+    document.getElementById('ac-warn-txt').innerHTML=`Si las curvas están <strong>una al lado de la otra</strong> (no arriba/abajo), 
+      considera integrar <strong>respecto a Y</strong>:<br>
+      <code style="background:rgba(0,0,0,0.3);padding:5px 8px;border-radius:6px;display:block;color:var(--cyan);font-size:11px;margin-top:6px">
+      A = ∫_c^d [x_derecha(y) − x_izquierda(y)] dy</code>
+      Despeja x en función de y para cada curva y luego integra verticalmente.`;
+  } else {
+    warnEl.style.display='none';
+  }
+
+  document.getElementById('ac-step3').style.display='block';
+  document.getElementById('ac-step3').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+
+function resetAC(){
+  document.getElementById('ac-step3').style.display='none';
+}
+
+function dlPNG(canvasId, nombre) {
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const link = document.createElement('a');
+  link.download = `tutoya-${nombre}-${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// ── DESCARGA PDF ───────────────────────────────────────────────
+function loadJsPDF(cb) {
+  if(window.jspdf) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+function buildPDF(titulo, canvasId, datos) {
+  loadJsPDF(() => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const W = 210, pad = 15;
+
+    // Header background
+    doc.setFillColor(9, 15, 57);
+    doc.rect(0, 0, W, 40, 'F');
+
+    // Logo area
+    doc.setFillColor(245, 197, 24);
+    doc.roundedRect(pad, 8, 24, 24, 3, 3, 'F');
+    doc.setTextColor(9, 15, 57);
+    doc.setFontSize(16); doc.setFont('helvetica','bold');
+    doc.text('π', pad+8, 24);
+
+    // Title
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18); doc.setFont('helvetica','bold');
+    doc.text('TUTOYA', pad+28, 18);
+    doc.setFontSize(10); doc.setFont('helvetica','normal');
+    doc.setTextColor(200, 200, 200);
+    doc.text('Simulador de Cálculo — '+titulo, pad+28, 26);
+    doc.setTextColor(150,150,150);
+    doc.setFontSize(8);
+    doc.text('Generado el '+new Date().toLocaleDateString('es-GT'), pad+28, 33);
+
+    let y = 48;
+
+    // Data boxes
+    if(datos && datos.length) {
+      datos.forEach((d,i) => {
+        const x = pad + (i%2)*(W/2-pad);
+        if(i%2===0 && i>0) y += 18;
+        const boxY = i%2===0 ? y : y;
+        doc.setFillColor(17,29,106);
+        doc.roundedRect(x, boxY, W/2-pad-4, 14, 2, 2, 'F');
+        doc.setTextColor(150,180,255); doc.setFontSize(7); doc.setFont('helvetica','normal');
+        doc.text(d.label.toUpperCase(), x+4, boxY+5);
+        doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
+        doc.text(String(d.value), x+4, boxY+11);
+      });
+      y += 24;
+    }
+
+    // Canvas image
+    const canvas = document.getElementById(canvasId);
+    if(canvas) {
+      const imgData = canvas.toDataURL('image/png');
+      const imgW = W - pad*2;
+      const imgH = imgW * canvas.height / canvas.width;
+      doc.addImage(imgData, 'PNG', pad, y, imgW, imgH);
+      y += imgH + 8;
+    }
+
+    // Footer
+    doc.setFillColor(9,15,57);
+    doc.rect(0, 287, W, 10, 'F');
+    doc.setTextColor(100,100,150); doc.setFontSize(7);
+    doc.text('© 2025 TUTOYA — Matemáticas para todos', pad, 293);
+    doc.text('tutoya.gt', W-pad, 293, {align:'right'});
+
+    doc.save(`tutoya-${titulo.toLowerCase().replace(/\s/g,'-')}.pdf`);
+  });
+}
+
+function dlPDFGraficador() {
+  const expr = document.getElementById('g-func')?.value || '';
+  const deriv = document.getElementById('g-rdf')?.textContent || '';
+  buildPDF('Análisis de Función', 'g-canvas', [
+    { label:'Función f(x)', value: expr },
+    { label:'Derivada f\'(x)', value: deriv },
+    { label:'f(0)', value: document.getElementById('g-f0')?.textContent || '—' },
+    { label:'f\'(0) pendiente', value: document.getElementById('g-df0')?.textContent || '—' },
+  ]);
+}
+
+function dlPDFTangente() {
+  buildPDF('Recta Tangente', 't-canvas', [
+    { label:'Punto de tangencia', value: document.getElementById('t-punto')?.textContent || '—' },
+    { label:'Pendiente m', value: document.getElementById('t-m')?.textContent || '—' },
+    { label:'Ecuación', value: document.getElementById('t-eq')?.textContent || '—' },
+    { label:'Función f(x)', value: document.getElementById('t-func')?.value || '—' },
+  ]);
+}
+
+function dlPDFOpt() {
+  buildPDF('Optimización', 'o-canvas', [
+    { label:'Función f(x)', value: document.getElementById('o-func')?.value || '—' },
+    { label:'Rango', value: (document.getElementById('o-xmin')?.value||'')+ ' a ' +(document.getElementById('o-xmax')?.value||'') },
+  ]);
+}
+
+function dlPDFArea() {
+  buildPDF('Área bajo la curva', 'a-canvas', [
+    { label:'Función f(x)', value: document.getElementById('a-func')?.value || '—' },
+    { label:'Intervalo [a, b]', value: '['+document.getElementById('a-inf')?.value+', '+document.getElementById('a-sup')?.value+']' },
+    { label:'Área total', value: document.getElementById('a-abs')?.textContent || '—' },
+    { label:'Integral neta', value: document.getElementById('a-net')?.textContent || '—' },
+  ]);
+}
+
+function dlPDFAreaCurvas() {
+  buildPDF('Área entre curvas', 'ac-canvas', [
+    { label:'f(x)', value: document.getElementById('ac-f')?.value || '—' },
+    { label:'g(x)', value: document.getElementById('ac-g')?.value || '—' },
+    { label:'Área', value: document.getElementById('ac-area')?.textContent || '—' },
+    { label:'Intersecciones', value: document.getElementById('ac-its')?.textContent || '—' },
+  ]);
+}
+
+// ── DESCARGA EXCEL ─────────────────────────────────────────────
+function loadXLSX(cb) {
+  if(window.XLSX) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+function dlXLSXGraficador() {
+  if(!gSt) return;
+  const { expr, deriv, xmin, xmax } = gSt;
+  loadXLSX(() => {
+    const rows = [['x', 'f(x)', "f'(x)", 'Pendiente']];
+    const N = 50;
+    for(let i=0; i<=N; i++) {
+      const x = xmin+(xmax-xmin)*i/N;
+      rows.push([
+        parseFloat(x.toFixed(4)),
+        ev(expr,x) !== null ? parseFloat(ev(expr,x).toFixed(6)) : 'N/A',
+        nd(expr,x) !== null ? parseFloat(nd(expr,x).toFixed(6)) : 'N/A',
+        nd(expr,x) !== null ? (nd(expr,x)>0?'Creciente':'Decreciente') : '—'
+      ]);
+    }
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:10},{wch:14},{wch:14},{wch:14}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Función');
+    XLSX.writeFile(wb, `tutoya-funcion-${expr.replace(/[^a-z0-9]/gi,'_')}.xlsx`);
+  });
+}
+
+function dlXLSXArea() {
+  const expr = document.getElementById('a-func')?.value || '';
+  const a = parseFloat(document.getElementById('a-inf')?.value)||0;
+  const b = parseFloat(document.getElementById('a-sup')?.value)||3;
+  if(!expr) return;
+  loadXLSX(() => {
+    const rows = [['x', 'f(x)', 'Área acumulada', 'Signo']];
+    const N = 50;
+    const dx = (b-a)/N;
+    let acum = 0;
+    for(let i=0; i<=N; i++) {
+      const x = a+dx*i;
+      const fx = ev(expr,x);
+      if(i>0) acum += (fx||0)*dx;
+      rows.push([
+        parseFloat(x.toFixed(4)),
+        fx !== null ? parseFloat(fx.toFixed(6)) : 'N/A',
+        parseFloat(acum.toFixed(6)),
+        fx !== null ? (fx>=0?'Positiva':'Negativa') : '—'
+      ]);
+    }
+    // Summary sheet
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols'] = [{wch:10},{wch:14},{wch:16},{wch:12}];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Valores');
+    // Add summary
+    const sum = [
+      ['RESUMEN',''],
+      ['Función', expr],
+      ['Intervalo', `[${a}, ${b}]`],
+      ['Área total', document.getElementById('a-abs')?.textContent||'—'],
+      ['Integral neta', document.getElementById('a-net')?.textContent||'—'],
+    ];
+    const ws2 = XLSX.utils.aoa_to_sheet(sum);
+    XLSX.utils.book_append_sheet(wb, ws2, 'Resumen');
+    XLSX.writeFile(wb, `tutoya-area-${expr.replace(/[^a-z0-9]/gi,'_')}.xlsx`);
+  });
+}
+</script>
+</body>
+</html>
