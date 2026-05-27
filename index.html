@@ -156,7 +156,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <!-- HEADER -->
 <div class="header">
   <div class="logo-row">
-    <img src="./tutoya-logo-3d.png" alt="TUTOYA" style="height:60px;object-fit:contain">
+    <img src="https://tutoyagt-app.github.io/Simuladores/tutoya-logo-3d.png" alt="TUTOYA" style="height:60px;object-fit:contain">
   </div>
   <div class="header-sub">Simulador de Cálculo</div>
 </div>
@@ -164,23 +164,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 <!-- TABS -->
 <div class="tabs-bar">
   <div class="tabs-inner">
-    <button class="tab active" onclick="switchTab(0)"><img src="./icono-graficador.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Graficador</button>
-    <button class="tab" onclick="switchTab(1)"><img src="./icono-tangente.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Recta Tangente</button>
-    <button class="tab" onclick="switchTab(2)"><img src="./icono-optimizacion.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Optimización</button>
-    <button class="tab" onclick="switchTab(3)"><img src="./icono-area-curva.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Área bajo curva</button>
-    <button class="tab" onclick="switchTab(4)"><img src="./icono-area-curvas.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Área entre curvas</button>
+    <button class="tab active" onclick="switchTab(0)"><img src="https://tutoyagt-app.github.io/Simuladores/icono-graficador.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Graficador</button>
+    <button class="tab" onclick="switchTab(1)"><img src="https://tutoyagt-app.github.io/Simuladores/icono-tangente.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Recta Tangente</button>
+    <button class="tab" onclick="switchTab(2)"><img src="https://tutoyagt-app.github.io/Simuladores/icono-optimizacion.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Optimización</button>
+    <button class="tab" onclick="switchTab(3)"><img src="https://tutoyagt-app.github.io/Simuladores/icono-area-curva.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Área bajo curva</button>
+    <button class="tab" onclick="switchTab(4)"><img src="https://tutoyagt-app.github.io/Simuladores/icono-area-curvas.jpeg" style="width:18px;height:18px;object-fit:contain;vertical-align:middle;margin-right:4px"> Área entre curvas</button>
   </div>
 </div>
 
 <div class="page">
 
 <!-- TUTO WELCOME BANNER -->
-<div style="background:linear-gradient(135deg,#111d6a 0%,#090f39 100%);border-radius:16px;padding:20px;margin-bottom:14px;display:flex;align-items:center;gap:16px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;position:relative">
-  <div style="position:absolute;right:-10px;top:-10px;width:120px;height:120px;background:rgba(245,197,24,0.05);border-radius:50%"></div>
-  <img src="./tuto-bombilla.png" alt="TUTO" style="width:80px;height:80px;object-fit:contain;flex-shrink:0">
-  <div>
-    <div style="font-size:16px;font-weight:800;color:#F5C518;margin-bottom:4px">¡Hola! Soy TUTO 👋</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.6">Tu asistente matemático. Selecciona un módulo arriba y te guío paso a paso. ¡Aprender cálculo nunca fue tan visual!</div>
+<div style="background:linear-gradient(135deg,#111d6a 0%,#090f39 100%);border-radius:16px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;position:relative">
+  <video autoplay loop muted playsinline style="width:100%;max-height:200px;object-fit:cover;display:block">
+    <source src="https://tutoyagt-app.github.io/Simuladores/video-simuladores.mp4" type="video/mp4">
+  </video>
+  <div style="padding:16px;display:flex;align-items:center;gap:14px;background:rgba(9,15,57,0.85);margin-top:-4px">
+    <img src="https://tutoyagt-app.github.io/Simuladores/tuto-bombilla.png" alt="TUTO" style="width:60px;height:60px;object-fit:contain;flex-shrink:0">
+    <div>
+      <div style="font-size:15px;font-weight:800;color:#F5C518;margin-bottom:3px">¡Hola! Soy TUTO 👋</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5">Selecciona un módulo arriba y te guío paso a paso. ¡Aprender cálculo nunca fue tan visual!</div>
+    </div>
   </div>
 </div>
 
@@ -243,8 +247,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="rb c"><div class="rl">f'(x) pendiente</div><div class="rv" id="g-dfx">—</div></div>
     </div>
     <div class="tuto">
-      <img src="./tuto-bombilla.png" class="tuto-av" alt="TUTO">
+      <img src="https://tutoyagt-app.github.io/Simuladores/tuto-bombilla.png" class="tuto-av" alt="TUTO">
       <div class="tuto-txt" id="g-tip">Mueve el deslizador para ver cómo cambia la pendiente en cada punto de la curva.</div>
+    </div>
+    <!-- Video TUTO resultado -->
+    <div style="margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)">
+      <video autoplay loop muted playsinline style="width:100%;max-height:160px;object-fit:cover;display:block">
+        <source src="https://tutoyagt-app.github.io/Simuladores/video-materias.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 </div>
@@ -299,7 +309,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <input type="range" id="t-slider" min="-4" max="4" step="0.1" value="1" oninput="updateTSlider()">
     </div>
     <div class="tuto">
-      <img src="./tuto-bombilla.png" class="tuto-av" alt="TUTO">
+      <img src="https://tutoyagt-app.github.io/Simuladores/tuto-bombilla.png" class="tuto-av" alt="TUTO">
       <div class="tuto-txt">Arrastra el deslizador y observa cómo la recta roja <strong>gira según la pendiente</strong> en cada punto. Donde la curva sube rápido, la recta es más inclinada.</div>
     </div>
   </div>
@@ -408,7 +418,7 @@ Paso 2: Evaluar f''(x) en cada candidato
       <div id="a-method-content"></div>
     </div>
     <div class="tuto" style="margin-top:10px">
-      <img src="./tuto-bombilla.png" class="tuto-av" alt="TUTO">
+      <img src="https://tutoyagt-app.github.io/Simuladores/tuto-bombilla.png" class="tuto-av" alt="TUTO">
       <div class="tuto-txt" id="a-tip">El área bajo la curva representa la acumulación total de f(x) en el intervalo dado.</div>
     </div>
   </div>
@@ -461,7 +471,7 @@ Paso 2: Evaluar f''(x) en cada candidato
       <input class="ni" id="ac-xmax" value="2">
     </div>
     <div id="ac-range-hint" class="tuto" style="margin-bottom:12px">
-      <img src="./tuto-bombilla.png" class="tuto-av" alt="TUTO">
+      <img src="https://tutoyagt-app.github.io/Simuladores/tuto-bombilla.png" class="tuto-av" alt="TUTO">
       <div class="tuto-txt" id="ac-hint-txt">Puedes usar el rango sugerido o ajustarlo manualmente.</div>
     </div>
     <button class="btn btn-gold" onclick="calcAreaCurvas()">∫∫ Calcular área entre curvas</button>
@@ -749,7 +759,7 @@ function calcOpt(){
   });
   const listEl=document.getElementById('o-list');listEl.innerHTML='';
   if(!cps.length){
-    listEl.innerHTML=`<div class="tuto"><img src="./tuto-bombilla.png" class="tuto-av" alt="TUTO">
+    listEl.innerHTML=`<div class="tuto"><img src="https://tutoyagt-app.github.io/Simuladores/tuto-bombilla.png" class="tuto-av" alt="TUTO">
       <div class="tuto-txt">No encontré puntos críticos en este rango. Prueba con <strong>x³−3x</strong> o amplía el rango.</div></div>`;
   } else {
     cps.forEach(cp=>{
@@ -913,7 +923,7 @@ function findIts(){
   // Info about intersections
   let itsInfo='';
   if(its.length===0){
-    itsInfo=`<div class="tuto"><img src="./tuto-bombilla.png" class="tuto-av" alt="TUTO">
+    itsInfo=`<div class="tuto"><img src="https://tutoyagt-app.github.io/Simuladores/tuto-bombilla.png" class="tuto-av" alt="TUTO">
       <div class="tuto-txt">No encontré intersecciones en el rango [-15, 15]. Las curvas no se cruzan o están muy separadas. Puedes ajustar el rango manualmente.</div></div>`;
     document.getElementById('ac-hint-txt').textContent='Las curvas no se intersectan. Ajusta el rango manualmente.';
   } else {
